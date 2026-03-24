@@ -13,6 +13,7 @@ import (
 	"yanxo/internal/location"
 	"yanxo/internal/service"
 	"yanxo/internal/session"
+	"yanxo/internal/templates"
 )
 
 type Router struct {
@@ -82,6 +83,13 @@ func (r *Router) handleMessage(ctx context.Context, upd tgbotapi.Update) {
 		return
 	}
 
+	// Global menu actions should always win over active wizard steps.
+	if isGlobalMenuAction(text) {
+		r.store.Clear(m.From.ID)
+		_ = r.start.RouteMenu(ctx, m)
+		return
+	}
+
 	// If in an active wizard flow, let wizard consume the input.
 	if st, ok := r.store.Get(m.From.ID); ok && st.Flow != session.FlowNone && st.Step != session.StepNone {
 		log.Printf("session user=%d flow=%s step=%s", m.From.ID, st.Flow, st.Step)
@@ -90,6 +98,23 @@ func (r *Router) handleMessage(ctx context.Context, upd tgbotapi.Update) {
 		}
 	}
 	_ = r.start.RouteMenu(ctx, m)
+}
+
+func isGlobalMenuAction(text string) bool {
+	switch strings.TrimSpace(text) {
+	case
+		templates.BtnTaxiCreate,
+		templates.BtnServiceCreate,
+		templates.BtnSearch,
+		templates.BtnMyAds,
+		templates.BtnOpenChannel,
+		templates.BtnSearchTaxi,
+		templates.BtnSearchService,
+		templates.BtnBack:
+		return true
+	default:
+		return false
+	}
 }
 
 func (r *Router) handleCallback(ctx context.Context, upd tgbotapi.Update) {
