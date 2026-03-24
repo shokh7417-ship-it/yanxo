@@ -74,11 +74,24 @@ func (r *Router) handleMessage(ctx context.Context, upd tgbotapi.Update) {
 
 	text := strings.TrimSpace(m.Text)
 	log.Printf("msg from=%d chat=%d text=%q", m.From.ID, m.Chat.ID, text)
-	if strings.HasPrefix(text, "/start") {
+	// Command handling should always interrupt any active flow.
+	// Use Telegram command parsing first (/start, /start@bot, /start payload).
+	if m.IsCommand() {
+		switch strings.ToLower(strings.TrimSpace(m.Command())) {
+		case "start":
+			_ = r.start.Start(ctx, m)
+			return
+		case "cancel":
+			_ = r.start.Cancel(ctx, m)
+			return
+		}
+	}
+	// Fallback for rare clients that send plain text command-like values.
+	if strings.EqualFold(text, "/start") {
 		_ = r.start.Start(ctx, m)
 		return
 	}
-	if text == "/cancel" {
+	if strings.EqualFold(text, "/cancel") {
 		_ = r.start.Cancel(ctx, m)
 		return
 	}

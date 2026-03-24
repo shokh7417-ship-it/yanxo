@@ -19,6 +19,11 @@ func NewStartHandler(ctx Context) *StartHandler { return &StartHandler{ctx: ctx}
 
 func (h *StartHandler) Start(ctx context.Context, m *tgbotapi.Message) error {
 	h.ctx.Store.Clear(m.From.ID)
+	// Hard reset UX: drop any previously shown custom keyboard before showing the fresh main menu.
+	clearKB := tgbotapi.NewMessage(m.Chat.ID, "🔄 Qayta boshlandi.")
+	clearKB.ReplyMarkup = tgbotapi.NewRemoveKeyboard(false)
+	_, _ = h.ctx.Bot.Send(clearKB)
+
 	msg := tgbotapi.NewMessage(m.Chat.ID, templates.WelcomeText())
 	msg.ReplyMarkup = templates.MainMenuKeyboard()
 	_, err := h.ctx.Bot.Send(msg)
