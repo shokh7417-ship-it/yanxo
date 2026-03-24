@@ -297,15 +297,12 @@ func (h *WizardHandler) handleTaxiCallback(ctx context.Context, q *tgbotapi.Call
 		editKB := tgbotapi.NewEditMessageReplyMarkup(msg.Chat.ID, msg.MessageID, empty)
 		_, _ = h.ctx.Bot.Send(editKB)
 
-		// Success: attach inline "Postni ochish" button under the same message.
-		// Then restore reply keyboard in a separate (tiny) message.
+		// Success: attach inline "Postni ochish" button.
 		success := tgbotapi.NewMessage(msg.Chat.ID, "✅ E’lon joylandi!")
 		success.ReplyMarkup = templates.PostOpenInline(ad, h.ctx.Cfg.ChannelID, h.ctx.Cfg.ChannelUsername)
 		_, _ = h.ctx.Bot.Send(success)
 
-		menu := tgbotapi.NewMessage(msg.Chat.ID, "\u200b")
-		menu.ReplyMarkup = templates.MainMenuKeyboard()
-		_, _ = h.ctx.Bot.Send(menu)
+		_ = h.sendMainMenu(msg.Chat.ID)
 		return true
 	}
 	if strings.HasPrefix(data, "cancel:taxi") {
@@ -520,9 +517,7 @@ func (h *WizardHandler) handleServiceCallback(ctx context.Context, q *tgbotapi.C
 		success.ReplyMarkup = templates.PostOpenInline(ad, h.ctx.Cfg.ChannelID, h.ctx.Cfg.ChannelUsername)
 		_, _ = h.ctx.Bot.Send(success)
 
-		menu := tgbotapi.NewMessage(msg.Chat.ID, "\u200b")
-		menu.ReplyMarkup = templates.MainMenuKeyboard()
-		_, _ = h.ctx.Bot.Send(menu)
+		_ = h.sendMainMenu(msg.Chat.ID)
 		return true
 	}
 	if strings.HasPrefix(data, "cancel:service") {
@@ -852,6 +847,16 @@ func (h *WizardHandler) sendMarkup(chatID int64, text string, markup any) error 
 	_, err := h.ctx.Bot.Send(msg)
 	if err != nil {
 		log.Printf("sendMarkup error chat_id=%d: %v", chatID, err)
+	}
+	return err
+}
+
+func (h *WizardHandler) sendMainMenu(chatID int64) error {
+	msg := tgbotapi.NewMessage(chatID, "Asosiy menyu:")
+	msg.ReplyMarkup = templates.MainMenuKeyboard()
+	_, err := h.ctx.Bot.Send(msg)
+	if err != nil {
+		log.Printf("sendMainMenu error chat_id=%d: %v", chatID, err)
 	}
 	return err
 }
