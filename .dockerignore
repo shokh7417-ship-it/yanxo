@@ -1,0 +1,16 @@
+# Git and local secrets
+.git
+.gitignore
+.env
+.env.*
+
+# IDE / local
+.cursor
+terminals
+*.log
+
+# Build artifacts (host)
+yanxo-bot.lock
+
+# Docs (optional; remove line if you want them in the image)
+README.md
