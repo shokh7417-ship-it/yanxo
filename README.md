@@ -99,7 +99,7 @@ Health endpointlar:
 - `GET /health`
 - `GET /healthz`
 
-Javob: `{"status":"ok"}`
+Javob: `ok` (oddiy matn, `text/plain`)
 
 ## Render deploy
 

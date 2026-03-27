@@ -14,10 +14,10 @@ func newHealthMux() http.Handler {
 			w.WriteHeader(http.StatusMethodNotAllowed)
 			return
 		}
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 		w.WriteHeader(http.StatusOK)
 		if r.Method == http.MethodGet {
-			_, _ = w.Write([]byte(`{"status":"ok"}`))
+			_, _ = w.Write([]byte("ok"))
 		}
 	}
 	// Path-only registration so HEAD works; /{$} = faqat "/", barcha pathlarni yutib qo‘ymaslik uchun.

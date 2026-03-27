@@ -30,7 +30,7 @@ RUN apk add --no-cache ca-certificates tzdata \
 
 WORKDIR /app
 
-# HTTP health: / , /health , /healthz → {"status":"ok"} (override with PORT / HEALTH_ADDR)
+# HTTP health: / , /health , /healthz → plain body: ok (override with PORT / HEALTH_ADDR)
 EXPOSE 8080
 ENV PORT=8080
 
